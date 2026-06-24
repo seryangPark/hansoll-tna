@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HANSOLL VINA — TNA 관리 시스템</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --color-text-primary:#1a1a1a;
+  --color-text-secondary:#6b7280;
+  --color-text-tertiary:#9ca3af;
+  --color-text-info:#185FA5;
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f9fafb;
+  --color-border-tertiary:#e5e7eb;
+  --color-border-secondary:#d1d5db;
+  --color-border-primary:#9ca3af;
+  --border-radius-md:6px;
+  --border-radius-lg:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:#fff}
+.shell{display:flex;height:100vh;min-height:600px}
+.sidebar{width:196px;flex-shrink:0;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.logo-area{padding:14px 12px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.logo-title{font-size:13px;font-weight:600}
+.logo-sub{font-size:10px;color:var(--color-text-secondary);margin-top:1px}
+.lang-toggle{display:flex;margin:10px 8px 2px;background:#fff;border-radius:20px;padding:2px;border:0.5px solid var(--color-border-tertiary)}
+.lang-btn{flex:1;font-size:11px;font-weight:500;padding:4px 0;border:none;border-radius:18px;cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all .15s;text-align:center}
+.lang-btn.ac{background:#1a1a1a;color:#fff}
+.nav-sec{padding:10px 8px 3px;font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary)}
+.nav-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:var(--border-radius-md);cursor:pointer;font-size:11px;color:var(--color-text-secondary);margin:1px 4px;border:none;background:transparent;width:calc(100% - 8px);text-align:left;transition:background .1s}
+.nav-item:hover{background:#fff;color:var(--color-text-primary)}
+.nav-item.ac{background:#fff;color:var(--color-text-primary);font-weight:500}
+.nav-item i{font-size:13px;flex-shrink:0;width:15px;text-align:center}
+.nb{margin-left:auto;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:500;flex-shrink:0}
+.nb-r{background:#FCEBEB;color:#A32D2D}.nb-a{background:#FAEEDA;color:#633806}
+.nb-b{background:#E6F1FB;color:#185FA5}.nb-x{background:#e5e7eb;color:#6b7280}
+.sb-bottom{margin-top:auto;padding:8px 10px;border-top:0.5px solid var(--color-border-tertiary);font-size:10px;color:var(--color-text-secondary)}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:11px 18px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.date-chip{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:3px 9px;border-radius:12px}
+.content{padding:16px 18px;flex:1}
+.view{display:none}.view.ac{display:block}
+.greeting{font-size:16px;font-weight:500;margin-bottom:3px}
+.greeting-sub{font-size:12px;color:var(--color-text-secondary);margin-bottom:16px}
+.alert-row{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.ab{padding:9px 12px;border-radius:var(--border-radius-md);font-size:11px;display:flex;align-items:flex-start;gap:7px;border:0.5px solid;line-height:1.5}
+.ab-r{background:#FCEBEB;color:#A32D2D;border-color:#F09595}
+.ab-a{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.sv{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:9px 11px;text-align:center}
+.svl{font-size:10px;color:var(--color-text-secondary);margin-bottom:2px}
+.svy{font-size:17px;font-weight:500}
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.hc{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:13px 14px;border:0.5px solid var(--color-border-tertiary);cursor:pointer}
+.hc:hover{border-color:var(--color-border-secondary)}
+.hc-icon{font-size:19px;margin-bottom:7px}
+.hc-title{font-size:12px;font-weight:500;margin-bottom:3px}
+.hc-desc{font-size:10px;color:var(--color-text-secondary);line-height:1.4}
+.hc-tag{margin-top:7px}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:500}
+.t-r{background:#FCEBEB;color:#A32D2D}.t-a{background:#FAEEDA;color:#633806}
+.t-g{background:#EAF3DE;color:#27500A}.t-b{background:#E6F1FB;color:#185FA5}
+.t-p{background:#EEEDFE;color:#3C3489}.t-x{background:#f3f4f6;color:#6b7280;border:0.5px solid #d1d5db}
+.sec-title{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-secondary);margin-bottom:9px;margin-top:2px;display:flex;align-items:center;gap:5px}
+.flt-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;align-items:center}
+.fb{font-size:11px;padding:3px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;background:transparent;color:var(--color-text-secondary)}
+.fb.ac{background:#fff;font-weight:500;border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.pcard{background:#fff;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:7px}
+.pc-hd{padding:10px 13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pc-hd:hover{background:var(--color-background-secondary)}
+.sp2{font-size:10px;font-weight:500;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.sp-wm{background:#E1F5EE;color:#085041}.sp-tb{background:#EEEDFE;color:#3C3489}
+.pgcol{display:flex;flex-direction:column;gap:3px;min-width:115px}
+.pg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--color-text-secondary)}
+.pgl{width:32px;flex-shrink:0}.pgbar{height:5px;border-radius:3px;overflow:hidden;flex:1;background:#e5e7eb}
+.pgf{height:100%;border-radius:3px}.pgv{min-width:24px;text-align:right;font-size:10px;flex-shrink:0}
+.pc-bd{display:none;border-top:0.5px solid var(--color-border-tertiary);padding:10px 13px}
+.pc-bd.op{display:block}
+.mt{width:100%;border-collapse:collapse;font-size:11px}
+.mt th{padding:5px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-weight:500;text-align:center}
+.mt th:first-child{text-align:left}.mt td{padding:5px 8px;border:0.5px solid var(--color-border-tertiary);text-align:right}
+.mt td:first-child{text-align:left;font-weight:500}.mt .tot td{font-weight:500;background:var(--color-background-secondary)}
+.pos{color:#3B6D11;font-weight:500}.neg{color:#A32D2D;font-weight:500}
+.stabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.stb{font-size:11px;padding:3px 9px;border:0.5px solid var(--color-border-tertiary);border-radius:6px;cursor:pointer;background:var(--color-background-secondary)}
+.stb.ac{background:#fff;font-weight:500;border-color:var(--color-border-primary)}
+.fw{overflow-x:auto;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+table.mat{width:100%;border-collapse:collapse;font-size:11px;min-width:460px}
+table.mat th{padding:6px 8px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;text-align:center;white-space:nowrap}
+table.mat td{padding:5px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:center}
+table.mat td:first-child{text-align:left}
+table.mat tr:last-child td{border-bottom:none}
+table.mat tr:hover{background:var(--color-background-secondary)}
+.cb{font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap}
+.cf{background:#EEEDFE;color:#3C3489}.ct{background:#E1F5EE;color:#085041}
+.cl{background:#E6F1FB;color:#0C447C}.cm{background:#FAEEDA;color:#633806}
+.pb2{display:flex;align-items:center;gap:4px;justify-content:center}
+.pbr2{height:5px;border-radius:3px;overflow:hidden;width:40px;background:#e5e7eb}
+.pbf2{height:100%;border-radius:3px}
+.em{text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:12px}
+.bgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:12px}
+.bc2{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:11px 13px;cursor:pointer;border:0.5px solid var(--color-border-tertiary)}
+.bc2:hover{border-color:var(--color-border-secondary)}
+.bw{height:4px;border-radius:2px;margin:6px 0 5px;overflow:hidden;background:#e5e7eb}
+.bwf{height:100%}
+.di{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.di:last-child{border-bottom:none}
+.sd{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px;vertical-align:1px}
+.orow{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:9px 12px;cursor:pointer;border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.orow:hover{border-color:var(--color-border-secondary)}
+.bkbtn{font-size:11px;padding:4px 9px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-bottom:9px}
+.bkbtn:hover{background:var(--color-background-secondary)}
+.bc3{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);margin-bottom:9px;flex-wrap:wrap}
+.bl{cursor:pointer;color:#185FA5}.bl:hover{text-decoration:underline}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px}
+.rc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:7px 9px}
+.rl{font-size:10px;color:var(--color-text-secondary);margin-bottom:2px}.rn{font-size:13px;font-weight:500}
+.pt{width:100%;border-collapse:collapse;font-size:11px}
+.pt th{padding:5px 7px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-weight:500;text-align:center}
+.pt td{padding:5px 7px;border:0.5px solid var(--color-border-tertiary);text-align:center}
+.pt td:first-child{text-align:left;font-weight:500}
+.pt .tot td{font-weight:500;background:var(--color-background-secondary)}
+.sched-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.sched-tbl th{padding:6px 9px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-weight:500;text-align:center}
+.sched-tbl th:first-child{text-align:left}
+.sched-tbl td{padding:6px 9px;border:0.5px solid var(--color-border-tertiary);text-align:center}
+.sched-tbl td:first-child{text-align:left;font-weight:500}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="sidebar">
+  <div class="logo-area">
+    <div class="logo-title">HANSOLL VINA</div>
+    <div class="logo-sub" id="sb-sub">TNA 관리 시스템</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn ac" id="btn-ko" onclick="setLang('ko')">한국어</button>
+    <button class="lang-btn" id="btn-vi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+  <div class="nav-sec" id="ns-overview">개요</div>
+  <button class="nav-item ac" onclick="go('home',this)" id="ni-home"><i class="ti ti-home" style="color:#639922"></i><span class="ni-label">홈</span></button>
+  <div class="nav-sec" id="ns-order">오더</div>
+  <button class="nav-item" onclick="go('order',this)" id="ni-order"><i class="ti ti-chart-bar" style="color:#639922"></i><span class="ni-label">오더 현황</span><span class="nb nb-r">2건</span></button>
+  <div class="nav-sec" id="ns-prep">투입 준비</div>
+  <button class="nav-item" onclick="go('material',this)" id="ni-material"><i class="ti ti-box" style="color:#7F77DD"></i><span class="ni-label">원부자재 입고</span><span class="nb nb-r">74</span></button>
+  <button class="nav-item" onclick="go('checklist',this)" id="ni-checklist"><i class="ti ti-clipboard-check" style="color:#7F77DD"></i><span class="ni-label">투입 체크리스트</span><span class="nb nb-x">준비중</span></button>
+  <div class="nav-sec" id="ns-prod">생산</div>
+  <button class="nav-item" onclick="go('schedule',this)" id="ni-schedule"><i class="ti ti-layout-grid" style="color:#BA7517"></i><span class="ni-label">라인 스케줄</span><span class="nb nb-r">위험</span></button>
+  <button class="nav-item" onclick="go('production',this)" id="ni-production"><i class="ti ti-needle-thread" style="color:#1D9E75"></i><span class="ni-label">생산 현황</span><span class="nb nb-b">38,997</span></button>
+  <button class="nav-item" onclick="go('cutting',this)" id="ni-cutting"><i class="ti ti-cut" style="color:#1D9E75"></i><span class="ni-label">재단 & EMB</span><span class="nb nb-a">주의</span></button>
+  <div class="nav-sec" id="ns-close">마무리</div>
+  <button class="nav-item" onclick="go('report',this)" id="ni-report"><i class="ti ti-report" style="color:#378ADD"></i><span class="ni-label">완료 리포트</span><span class="nb nb-x">준비중</span></button>
+  <div class="sb-bottom" id="sb-date">기준일: 2026-06-22</div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title"><i class="ti ti-home" style="color:#639922"></i><span id="page-title">홈 대시보드</span></div>
+    <span class="date-chip">2026-06-22</span>
+  </div>
+  <div class="content">
+
+  <div class="view ac" id="v-home">
+    <div class="greeting" id="h-greeting">안녕하세요 👋 오늘의 현황입니다</div>
+    <div class="greeting-sub" id="h-sub">한솔비나 2공장 · TNA 관리 시스템</div>
+    <div class="alert-row">
+      <div class="ab ab-r"><i class="ti ti-alert-circle" style="font-size:14px;flex-shrink:0"></i><div id="al1"><strong>납기 긴급:</strong> 263013568·263900024·263900025 X-FTY 경과. 263013528 D-24 봉제 13%.</div></div>
+      <div class="ab ab-a"><i class="ti ti-alert-triangle" style="font-size:14px;flex-shrink:0"></i><div id="al2"><strong>원부자재 미입고:</strong> 5개 스타일 74건. 264013746 라벨 21개 전량 미입고.</div></div>
+      <div class="ab ab-a"><i class="ti ti-alert-triangle" style="font-size:14px;flex-shrink:0"></i><div id="al3"><strong>재단 품질:</strong> 263013568 원단폭 64"~72" 편차 8". yd빠짐 -555yd.</div></div>
+    </div>
+    <div class="stats4">
+      <div class="sv"><div class="svl" id="st1l">탈봇 총 오더</div><div class="svy" style="color:#3C3489">28,992</div></div>
+      <div class="sv"><div class="svl" id="st2l">오늘 봉제 2A</div><div class="svy" style="color:#1D9E75">38,997</div></div>
+      <div class="sv"><div class="svl" id="st3l">오늘 봉제 2B</div><div class="svy" style="color:#1D9E75">6,299</div></div>
+      <div class="sv"><div class="svl" id="st4l">원부자재 문제</div><div class="svy" style="color:#A32D2D">74건</div></div>
+    </div>
+    <div class="sec-title" id="h-shortcut-title"><i class="ti ti-apps"></i>바로가기</div>
+    <div class="home-grid">
+      <div class="hc" onclick="go('order',document.getElementById('ni-order'))"><div class="hc-icon"><i class="ti ti-chart-bar" style="color:#639922"></i></div><div class="hc-title" id="hc1t">오더 현황</div><div class="hc-desc" id="hc1d">바이어별 수주 현황 · PO Recap · 납기</div><div class="hc-tag"><span class="tag t-g">TALBOTS 28,992pcs</span></div></div>
+      <div class="hc" onclick="go('material',document.getElementById('ni-material'))"><div class="hc-icon"><i class="ti ti-box" style="color:#7F77DD"></i></div><div class="hc-title" id="hc2t">원부자재 입고</div><div class="hc-desc" id="hc2d">5개 스타일 발란스 · 문제 항목 필터</div><div class="hc-tag"><span class="tag t-r">문제 74건</span></div></div>
+      <div class="hc" onclick="go('schedule',document.getElementById('ni-schedule'))"><div class="hc-icon"><i class="ti ti-layout-grid" style="color:#BA7517"></i></div><div class="hc-title" id="hc3t">라인 스케줄</div><div class="hc-desc" id="hc3d">납기 위험 하이라이트 · Gantt</div><div class="hc-tag"><span class="tag t-r">납기 경과 다수</span></div></div>
+      <div class="hc" onclick="go('production',document.getElementById('ni-production'))"><div class="hc-icon"><i class="ti ti-needle-thread" style="color:#1D9E75"></i></div><div class="hc-title" id="hc4t">생산 현황</div><div class="hc-desc" id="hc4d">2A/2B 봉제OUT · 피니싱 · 패킹</div><div class="hc-tag"><span class="tag t-b">오늘 2A 38,997 · 2B 6,299</span></div></div>
+      <div class="hc" onclick="go('cutting',document.getElementById('ni-cutting'))"><div class="hc-icon"><i class="ti ti-cut" style="color:#1D9E75"></i></div><div class="hc-title" id="hc5t">재단 & EMB</div><div class="hc-desc" id="hc5d">요척 비교 · 원단폭 · yd빠짐 · EMB</div><div class="hc-tag"><span class="tag t-a">568 원단폭 편차 주의</span></div></div>
+      <div class="hc" onclick="go('report',document.getElementById('ni-report'))"><div class="hc-icon"><i class="ti ti-report" style="color:#378ADD"></i></div><div class="hc-title" id="hc6t">완료 리포트</div><div class="hc-desc" id="hc6d">원단 수지 · 수율 · 공임 · FOB</div><div class="hc-tag"><span class="tag t-x" id="hc6tag">준비중</span></div></div>
+    </div>
+  </div>
+
+  <div class="view" id="v-order">
+    <div id="vb-o">
+      <div class="sec-title" id="o-sec-title"><i class="ti ti-chart-bar"></i>바이어별 오더 현황</div>
+      <div class="bgrid">
+        <div class="bc2" onclick="openBuyer('talbot')">
+          <div style="font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px"><i class="ti ti-tag" style="color:#7F77DD;font-size:13px"></i>TALBOTS</div>
+          <div class="bw"><div class="bwf" style="width:100%;background:#7F77DD"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:5px"><span id="tb-styles">5개 스타일</span><span style="font-weight:500">28,992 pcs</span></div>
+          <div class="di"><span><span class="sd" style="background:#E24B4A"></span>7/16 <span id="tb-due">납기</span></span><span style="font-weight:500">9,585 pcs</span></div>
+          <div class="di"><span><span class="sd" style="background:#EF9F27"></span>8/13 <span id="tb-due2">납기</span></span><span style="font-weight:500">19,407 pcs</span></div>
+        </div>
+        <div class="bc2" onclick="openBuyer('walmart')">
+          <div style="font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px"><i class="ti ti-tag" style="color:#1D9E75;font-size:13px"></i>WALMART</div>
+          <div class="bw"><div class="bwf" style="width:84%;background:#1D9E75"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:5px"><span id="wm-styles">다수 스타일</span><span style="font-weight:500" id="wm-progress">진행중</span></div>
+          <div class="di"><span><span class="sd" style="background:#E24B4A"></span><span id="wm-danger">납기 위험</span></span><span style="font-weight:500">Girls HQ263935</span></div>
+          <div class="di"><span><span class="sd" style="background:#EF9F27"></span>7/30~8/1</span><span style="font-weight:500">#7990 YA</span></div>
+        </div>
+      </div>
+      <div style="padding:8px 11px;background:#f9fafb;border-radius:6px;font-size:11px;color:#6b7280" id="o-hint"><i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:3px"></i>바이어를 클릭하면 PO Recap을 확인할 수 있어요</div>
+    </div>
+    <div id="vo-o" style="display:none"><button class="bkbtn" onclick="showOView('b')"><i class="ti ti-arrow-left"></i><span id="o-back1-lbl">바이어 목록</span></button><div class="bc3" id="bc-o"></div><div id="ol"></div></div>
+    <div id="vr-o" style="display:none"><button class="bkbtn" onclick="showOView('l')"><i class="ti ti-arrow-left"></i><span id="o-back2-lbl">오더 목록</span></button><div class="bc3" id="bc-r"></div><div id="rc"></div></div>
+  </div>
+
+  <div class="view" id="v-material">
+    <div class="sec-title" id="m-sec-title"><i class="ti ti-box"></i>원부자재 입고 현황</div>
+    <div class="stabs" id="mat-stabs"></div>
+    <div class="stats4" id="mat-stats"></div>
+    <div class="flt-row">
+      <span style="font-size:11px;color:#6b7280" id="m-filter-lbl">필터:</span>
+      <button class="fb" style="background:#FCEBEB;color:#A32D2D;border-color:#F09595" onclick="setMF('p',this)" id="mf-p">문제만</button>
+      <button class="fb" onclick="setMF('a',this)" id="mf-a">전체</button>
+      <button class="fb" onclick="setMF('f',this)" id="mf-f">원단·실</button>
+      <button class="fb" onclick="setMF('l',this)" id="mf-l">라벨</button>
+      <button class="fb" onclick="setMF('m',this)" id="mf-m">부자재</button>
+    </div>
+    <div class="fw"><table class="mat"><thead><tr>
+      <th style="text-align:left" id="mth1">구분</th><th style="text-align:left" id="mth2">품명</th>
+      <th id="mth3">사이즈</th><th id="mth4">필요량</th><th id="mth5">입고량</th><th id="mth6">잔액</th><th id="mth7">입고율</th><th id="mth8">상태</th>
+    </tr></thead><tbody id="mat-tbody"></tbody></table></div>
+    <div id="mat-empty" class="em" style="display:none"><i class="ti ti-check" style="font-size:20px;color:#639922;display:block;margin-bottom:5px"></i><span id="m-empty-lbl">문제 항목 없음</span></div>
+  </div>
+
+  <div class="view" id="v-schedule">
+    <div class="sec-title" id="sc-title"><i class="ti ti-layout-grid"></i>라인 스케줄 — 2026-06-19 기준</div>
+    <div class="ab ab-r" style="margin-bottom:10px"><i class="ti ti-alert-circle" style="font-size:13px;flex-shrink:0"></i><span id="sc-alert">납기 경과: 263013568 (6/18), 263900024·263900025 (6/19)</span></div>
+    <table class="sched-tbl">
+      <thead><tr><th id="sch1">라인</th><th id="sch2">바이어</th><th id="sch3">스타일</th><th id="sch4">X-FTY</th><th id="sch5">투가일</th><th id="sch6">D-Day</th><th id="sch7">상태</th></tr></thead>
+      <tbody>
+        <tr><td>L45</td><td>TALBOTS</td><td>263013568</td><td>6/18</td><td>—</td><td style="color:#A32D2D">D+4</td><td><span class="tag t-r" id="st-d1">납기경과</span></td></tr>
+        <tr><td>L45</td><td>TALBOTS</td><td>263013528</td><td>7/16</td><td>6/16</td><td>D-24</td><td><span class="tag t-a" id="st-t1">타이트</span></td></tr>
+        <tr><td>L45</td><td>TALBOTS</td><td>264013746</td><td>8/13</td><td>7/9</td><td>D-52</td><td><span class="tag t-g" id="st-n1">정상</span></td></tr>
+        <tr><td>L46</td><td>TALBOTS</td><td>263900025</td><td>6/19</td><td>5/9</td><td style="color:#A32D2D">D+3</td><td><span class="tag t-r" id="st-d2">납기경과</span></td></tr>
+        <tr><td>L26~28</td><td>WALMART</td><td>HQ263935</td><td>7/1</td><td>6/25</td><td>D-9</td><td><span class="tag t-r" id="st-d3">납기문제</span></td></tr>
+        <tr><td>L29~42</td><td>WALMART</td><td>NB46HQ267990</td><td>7/30</td><td>진행중</td><td>D-38</td><td><span class="tag t-a" id="st-p1">진행중</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="view" id="v-production">
+    <div class="sec-title" id="pr-title"><i class="ti ti-needle-thread"></i>생산 현황 — 2026-06-22</div>
+    <div class="flt-row" id="prod-ftabs">
+      <button class="fb ac" onclick="setPF('all',this)" id="pf-all">전체</button>
+      <button class="fb" onclick="setPF('2a',this)">2A</button>
+      <button class="fb" onclick="setPF('2b',this)">2B</button>
+      <button class="fb" onclick="setPF('wm',this)">WALMART</button>
+      <button class="fb" onclick="setPF('tb',this)">TALBOTS</button>
+    </div>
+    <div class="stats4" id="prod-stats"></div>
+    <div id="prod-cards"></div>
+  </div>
+
+  <div class="view" id="v-cutting">
+    <div class="sec-title" id="ct-title"><i class="ti ti-cut"></i>재단 & EMB/PRINT 현황</div>
+    <div class="ab ab-r" style="margin-bottom:10px"><i class="ti ti-alert-circle" style="font-size:13px;flex-shrink:0"></i><span id="ct-alert">263013568 원단폭 편차 8" · yd빠짐 -555yd · 263013528 W.Petite 요척 +29% 초과</span></div>
+    <table class="sched-tbl">
+      <thead><tr><th id="cth1" style="text-align:left">스타일/FIT</th><th id="cth2">사업부 요척</th><th id="cth3">실요척</th><th id="cth4">차이</th><th id="cth5">원단폭 편차</th><th id="cth6">yd빠짐</th><th id="cth7">상태</th></tr></thead>
+      <tbody>
+        <tr><td>263013528 Missy+Petite</td><td>0.949</td><td style="color:#3B6D11">0.854</td><td class="pos">-10.0%</td><td>없음(68")</td><td>-287.7yd</td><td><span class="tag t-g" id="cs-ok1">정상</span></td></tr>
+        <tr><td>263013528 Woman</td><td>0.949</td><td style="color:#854F0B">1.034</td><td class="neg">+9.0%</td><td>없음(68")</td><td>-104.9yd</td><td><span class="tag t-a" id="cs-w1">주의</span></td></tr>
+        <tr><td>263013528 W.Petite</td><td>0.949</td><td style="color:#A32D2D">1.226</td><td class="neg">+29.2%</td><td>없음(68")</td><td>-2.1yd</td><td><span class="tag t-r" id="cs-d1">위험</span></td></tr>
+        <tr><td>263013568 Missy</td><td>—</td><td>0.708</td><td>—</td><td class="neg">8"(64~72")</td><td class="neg">-277.3yd</td><td><span class="tag t-r" id="cs-d2">위험</span></td></tr>
+        <tr><td>263013568 Petite</td><td>—</td><td>0.648</td><td>—</td><td class="neg">5"(64~69")</td><td class="neg">-173.6yd</td><td><span class="tag t-r" id="cs-d3">위험</span></td></tr>
+        <tr><td>263013568 Woman</td><td>—</td><td>0.854</td><td>—</td><td class="neg">5"(64~69")</td><td class="neg">-104.5yd</td><td><span class="tag t-a" id="cs-w2">주의</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="view" id="v-checklist">
+    <div class="sec-title" id="cl-title"><i class="ti ti-clipboard-check"></i>투입 체크리스트</div>
+    <div class="em"><i class="ti ti-upload" style="font-size:26px;display:block;margin-bottom:8px;color:#7F77DD"></i><span id="cl-empty">파일을 업로드해주세요</span></div>
+  </div>
+
+  <div class="view" id="v-report">
+    <div class="sec-title" id="rp-title"><i class="ti ti-report"></i>완료 리포트</div>
+    <div class="em"><i class="ti ti-file-plus" style="font-size:26px;display:block;margin-bottom:8px;color:#378ADD"></i><span id="rp-empty">생산 완료 후 작성 가능합니다</span></div>
+  </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const T={
+  ko:{
+    sb_sub:'TNA 관리 시스템',sb_date:'기준일: 2026-06-22',
+    ns_overview:'개요',ns_order:'오더',ns_prep:'투입 준비',ns_prod:'생산',ns_close:'마무리',
+    ni:{home:'홈',order:'오더 현황',material:'원부자재 입고',checklist:'투입 체크리스트',schedule:'라인 스케줄',production:'생산 현황',cutting:'재단 & EMB',report:'완료 리포트'},
+    titles:{home:'홈 대시보드',order:'오더 현황',material:'원부자재 입고 현황',schedule:'라인 스케줄',production:'생산 현황',cutting:'재단 & EMB',checklist:'투입 체크리스트',report:'완료 리포트'},
+    icons:{home:'ti-home',order:'ti-chart-bar',material:'ti-box',schedule:'ti-layout-grid',production:'ti-needle-thread',cutting:'ti-cut',checklist:'ti-clipboard-check',report:'ti-report'},
+    greeting:'안녕하세요 👋 오늘의 현황입니다',greeting_sub:'한솔비나 2공장 · TNA 관리 시스템',
+    al1:'<strong>납기 긴급:</strong> 263013568·263900024·263900025 X-FTY 경과. 263013528 D-24 봉제 13%.',
+    al2:'<strong>원부자재 미입고:</strong> 5개 스타일 74건. 264013746 라벨 21개 전량 미입고.',
+    al3:'<strong>재단 품질:</strong> 263013568 원단폭 64"~72" 편차 8". yd빠짐 -555yd.',
+    st1l:'탈봇 총 오더',st2l:'오늘 봉제 2A',st3l:'오늘 봉제 2B',st4l:'원부자재 문제',
+    shortcut:'바로가기',
+    hc1t:'오더 현황',hc1d:'바이어별 수주 현황 · PO Recap · 납기',
+    hc2t:'원부자재 입고',hc2d:'5개 스타일 발란스 · 문제 항목 필터',
+    hc3t:'라인 스케줄',hc3d:'납기 위험 하이라이트 · Gantt',
+    hc4t:'생산 현황',hc4d:'2A/2B 봉제OUT · 피니싱 · 패킹',
+    hc5t:'재단 & EMB',hc5d:'요척 비교 · 원단폭 · yd빠짐 · EMB',
+    hc6t:'완료 리포트',hc6d:'원단 수지 · 수율 · 공임 · FOB',hc6tag:'준비중',
+    o_sec_title:'바이어별 오더 현황',tb_styles:'5개 스타일',o_due:'납기',
+    wm_styles:'다수 스타일',wm_progress:'진행중',wm_danger:'납기 위험',
+    o_hint:'바이어를 클릭하면 PO Recap을 확인할 수 있어요',o_back1:'바이어 목록',o_back2:'오더 목록',
+    stn:{w:'납기위험',t:'타이트',k:'정상'},
+    m_sec_title:'원부자재 입고 현황',m_filter:'필터:',mf_p:'문제만',mf_a:'전체',mf_f:'원단·실',mf_l:'라벨',mf_m:'부자재',
+    mth:['구분','품명','사이즈','필요량','입고량','잔액','입고율','상태'],m_empty:'문제 항목 없음',
+    mst_total:'전체',mst_prob:'문제',mst_none:'미입고',mst_short:'수량부족',
+    mat_ok:'정상',mat_none:'미입고',mat_short:'부족',
+    sc_title:'라인 스케줄 — 2026-06-19 기준',sc_alert:'납기 경과: 263013568 (6/18), 263900024·263900025 (6/19), WM Girls L27·L28',
+    sch:['라인','바이어','스타일','X-FTY','투가일','D-Day','상태'],
+    sched_status:{d:'납기경과',t:'타이트',n:'정상',p:'진행중',w:'납기문제'},
+    pr_title:'생산 현황 — 2026-06-22',pf_all:'전체',
+    prod_stat:['총 오더','봉제OUT 누계','오늘 봉제OUT','지연/주의'],
+    prod_proc:['재단','봉제IN','봉제OUT','피니싱','패킹'],
+    prod_st:{ok:'진행중',warn:'주의',danger:'납기지연',done:'출고완료'},
+    ct_title:'재단 & EMB/PRINT 현황',ct_alert:'263013568 원단폭 편차 8인치 · yd빠짐 -555yd · 263013528 W.Petite 요척 +29% 초과',
+    cth:['스타일/FIT','사업부 요척','실요척','차이','원단폭 편차','yd빠짐','상태'],
+    ct_ok:'정상',ct_warn:'주의',ct_danger:'위험',
+    cl_title:'투입 체크리스트',cl_empty:'파일을 업로드해주세요',
+    rp_title:'완료 리포트',rp_empty:'생산 완료 후 작성 가능합니다',
+  },
+  vi:{
+    sb_sub:'Hệ thống quản lý TNA',sb_date:'Ngày: 2026-06-22',
+    ns_overview:'TỔNG QUAN',ns_order:'ĐƠN HÀNG',ns_prep:'CHUẨN BỊ',ns_prod:'SẢN XUẤT',ns_close:'HOÀN TẤT',
+    ni:{home:'Trang chủ',order:'Tình trạng ĐH',material:'Nhập kho NPL',checklist:'Checklist',schedule:'Lịch sản xuất',production:'Tình hình SX',cutting:'Cắt & Thêu/In',report:'Báo cáo HT'},
+    titles:{home:'Trang chủ',order:'Tình trạng đơn hàng',material:'Tình hình nhập kho NPL',schedule:'Lịch sản xuất',production:'Tình hình sản xuất',cutting:'Cắt & Thêu/In',checklist:'Checklist chuẩn bị',report:'Báo cáo hoàn tất'},
+    icons:{home:'ti-home',order:'ti-chart-bar',material:'ti-box',schedule:'ti-layout-grid',production:'ti-needle-thread',cutting:'ti-cut',checklist:'ti-clipboard-check',report:'ti-report'},
+    greeting:'Xin chào 👋 Tình hình hôm nay',greeting_sub:'Hansoll Vina Xưởng 2 · Hệ thống TNA',
+    al1:'<strong>Khẩn cấp giao hàng:</strong> 263013568·263900024·263900025 đã quá X-FTY. 263013528 còn D-24, may 13%.',
+    al2:'<strong>NPL chưa nhập kho:</strong> 74 vấn đề / 5 mã. 264013746 nhãn 21 cái chưa nhập.',
+    al3:'<strong>Chất lượng cắt:</strong> 263013568 khổ vải lệch 8" (64"~72"). Thiếu yard -555yd.',
+    st1l:'Tổng SL đơn Talbots',st2l:'May hôm nay 2A',st3l:'May hôm nay 2B',st4l:'Vấn đề NPL',
+    shortcut:'Truy cập nhanh',
+    hc1t:'Tình trạng đơn hàng',hc1d:'Đơn hàng theo buyer · PO Recap · Giao hàng',
+    hc2t:'Nhập kho NPL',hc2d:'Balance 5 mã · Lọc vấn đề',
+    hc3t:'Lịch sản xuất',hc3d:'Highlight rủi ro · Gantt',
+    hc4t:'Tình hình SX',hc4d:'2A/2B May OUT · Hoàn thiện · Đóng gói',
+    hc5t:'Cắt & Thêu/In',hc5d:'So sánh định mức · Khổ vải · Thiếu yard',
+    hc6t:'Báo cáo hoàn tất',hc6d:'Vải · Năng suất · Công may · FOB',hc6tag:'Chưa sẵn',
+    o_sec_title:'Tình trạng đơn hàng theo buyer',tb_styles:'5 mã hàng',o_due:'Giao hàng',
+    wm_styles:'Nhiều mã',wm_progress:'Đang thực hiện',wm_danger:'Rủi ro giao hàng',
+    o_hint:'Nhấn vào buyer để xem chi tiết PO Recap',o_back1:'Danh sách buyer',o_back2:'Danh sách ĐH',
+    stn:{w:'Rủi ro GH',t:'Gấp',k:'Bình thường'},
+    m_sec_title:'Tình hình nhập kho NPL',m_filter:'Lọc:',mf_p:'Vấn đề',mf_a:'Tất cả',mf_f:'Vải·Chỉ',mf_l:'Nhãn',mf_m:'Phụ liệu',
+    mth:['Loại','Tên hàng','Kích cỡ','Cần','Đã nhập','Chênh lệch','Tỷ lệ','Trạng thái'],m_empty:'Không có vấn đề',
+    mst_total:'Tổng',mst_prob:'Vấn đề',mst_none:'Chưa nhập',mst_short:'Thiếu SL',
+    mat_ok:'Bình thường',mat_none:'Chưa nhập',mat_short:'Thiếu',
+    sc_title:'Lịch sản xuất — 19/06/2026',sc_alert:'Quá hạn: 263013568 (18/6), 263900024·263900025 (19/6), WM Girls L27·L28',
+    sch:['Chuyền','Buyer','Mã hàng','X-FTY','Ngày vào chuyền','D-Day','Trạng thái'],
+    sched_status:{d:'Quá hạn',t:'Gấp',n:'Bình thường',p:'Đang SX',w:'Vấn đề GH'},
+    pr_title:'Tình hình sản xuất — 22/06/2026',pf_all:'Tất cả',
+    prod_stat:['Tổng đơn hàng','Tổng may OUT','May OUT hôm nay','Trễ/Cảnh báo'],
+    prod_proc:['Cắt','Vào chuyền','May OUT','Hoàn thiện','Đóng gói'],
+    prod_st:{ok:'Đang SX',warn:'Cảnh báo',danger:'Trễ hàng',done:'Đã xuất'},
+    ct_title:'Cắt & Thêu/In',ct_alert:'263013568 khổ vải lệch 8" · Thiếu yard -555yd · 263013528 W.Petite định mức +29%',
+    cth:['Mã/FIT','Định mức KR','Định mức thực','Chênh lệch','Lệch khổ vải','Thiếu Yard','Trạng thái'],
+    ct_ok:'Bình thường',ct_warn:'Cảnh báo',ct_danger:'Nguy hiểm',
+    cl_title:'Checklist chuẩn bị đầu chuyền',cl_empty:'Vui lòng upload file checklist',
+    rp_title:'Báo cáo hoàn tất sản xuất',rp_empty:'Có thể lập sau khi hoàn tất sản xuất',
+  }
+};
+
+const MAT={'263013528':{d:[
+  {i:'FABRIC',d:'100% COTTON Single Jersey',c:'LODEN FROST',s:'B01',nd:9641.93,rv:9710,ct:'f'},
+  {i:'Label Care',d:'#TL-CARE-N-TL',c:'100% COTTON',s:'ALL',nd:9872.55,rv:9870,ct:'l'},
+  {i:'Label Heat Seal',d:'TL-CORE-TL1 Missy S',c:'GREY',s:'S',nd:750.2,rv:750,ct:'l'},
+  {i:'MOBILON',d:'Clear Tape 0615',c:'CLEAR',s:'615',nd:3191.81,rv:3161,ct:'m'},
+  {i:'GUM TAPE',d:'LOGO GUM TAPE',c:'—',s:'—',nd:13.42,rv:0,ct:'m'},
+  {i:'GUM TAPE',d:'3M scotch tape',c:'—',s:'—',nd:15.34,rv:15,ct:'m'},
+  {i:'Tag Pin',d:'Tag Pin 3" Black',c:'Black',s:'—',nd:9585,rv:9485,ct:'m'},
+  {i:'TISSUE PAPER',d:'TISSUE PAPER D23',c:'D23',s:'10.5x10"',nd:9776.7,rv:0,ct:'m'},
+]},'264013746':{d:[
+  {i:'FABRIC',d:'95/5% COTTON/SPANDEX',c:'TA IVORY',s:'B01',nd:12864.85,rv:13055,ct:'f'},
+  {i:'Sewing Thread',d:'TOP STITCH C8261',c:'TA IVORY',s:'5M',nd:368.44,rv:368,ct:'t'},
+  {i:'Label Care',d:'#TL-CARE-N-TL',c:'95% COTTON',s:'ALL',nd:13122.2,rv:0,ct:'l'},
+  {i:'Label HS Missy',d:'TL-TT-G XS~XL (5 sizes)',c:'GREY',s:'XS~XL',nd:7744.2,rv:0,ct:'l'},
+  {i:'Label HS Petite',d:'TL-TTP-2 P~XLP (5 sizes)',c:'GREY',s:'P~XLP',nd:4022.4,rv:0,ct:'l'},
+  {i:'Label HS Plus',d:'TL-TTW X~3X (4 sizes)',c:'GREY',s:'X~3X',nd:1960.1,rv:0,ct:'l'},
+  {i:'Label HS PlusP',d:'TL-TTWP XP~3XP (4 sizes)',c:'GREY',s:'XP~3XP',nd:289.3,rv:0,ct:'l'},
+  {i:'MOBILON',d:'Clear Tape 0615',c:'CLEAR',s:'615',nd:3949.4,rv:3949,ct:'m'},
+  {i:'GUM TAPE',d:'3M scotch tape',c:'—',s:'—',nd:20.38,rv:20,ct:'m'},
+]},'264900010':{d:[
+  {i:'FABRIC',d:'CM/Poly 60/40 B01',c:'GREY SKY',s:'B01',nd:2013.32,rv:0,ct:'f'},
+  {i:'FABRIC',d:'CM/Poly 60/40 T01',c:'GREY SKY',s:'T01',nd:128.81,rv:0,ct:'f'},
+  {i:'Label Care',d:'#TL-CARE-N-TL',c:'—',s:'ALL',nd:2412.26,rv:0,ct:'l'},
+  {i:'LABEL MAIN',d:'TL-OUT-8 + TL-OUT-R-P8',c:'—',s:'All',nd:2412.26,rv:0,ct:'l'},
+  {i:'Label Size',d:'TL-CORE-SIZE-R2-W (9 sizes)',c:'—',s:'S~XLP',nd:2412.26,rv:0,ct:'l'},
+]},'264034719':{d:[
+  {i:'FABRIC',d:'MODAL/POLY/SPNDX B01',c:'HAUTE RED',s:'B01',nd:5822.3,rv:5603.7,ct:'f'},
+  {i:'FABRIC',d:'NYLON/SPANDEX T01',c:'HAUTE RED',s:'T01',nd:743.6,rv:730,ct:'f'},
+  {i:'Sewing Thread',d:'LOOP/TOP/ASTRA',c:'HAUTE RED',s:'5M',nd:299.47,rv:0,ct:'t'},
+  {i:'CARE LABEL',d:'TL-CARE-N-TL',c:'47% MDL',s:'ALL',nd:4538.1,rv:0,ct:'l'},
+  {i:'String Poly',d:'MFG-2805 WomenP XP~3XP',c:'HAUTE RED',s:'XP~3XP',nd:46.2,rv:0,ct:'m'},
+  {i:'Comez Band',d:'Heat press WomenP 2 1/4"',c:'BLACK',s:'2 1/4"',nd:54.33,rv:0,ct:'m'},
+]},'264034736':{d:[
+  {i:'FABRIC',d:'MODAL/POLY/SPNDX B01',c:'HAUTE RED',s:'B01',nd:5099.78,rv:5140.8,ct:'f'},
+  {i:'Sewing Thread',d:'TOP STITCH C3781',c:'HAUTE RED',s:'5M',nd:178.8,rv:152,ct:'t'},
+  {i:'Label Care',d:'#TL-CARE-N-TL',c:'47% MODAL',s:'ALL',nd:4454.75,rv:0,ct:'l'},
+  {i:'MAIN LABEL',d:'TL-TBT-2',c:'—',s:'ALL',nd:4454.75,rv:0,ct:'l'},
+  {i:'SIZE LABEL',d:'TL-TBT-SIZE-2 (18 sizes)',c:'—',s:'XS~3XP',nd:4708.3,rv:0,ct:'l'},
+  {i:'MOBILON',d:'Clear Tape 0615',c:'CLEAR',s:'615',nd:2642.57,rv:2643,ct:'m'},
+]}};
+
+const PROD=[
+  {id:'HQ263935-USA',b:'wm',f:'2a',nm:'Girls Core Tee USA',cl:'MULTI',xf:'2026-09-03',order:2327752,cut_t:10719,cut_T:2379351,si_t:15591,si_T:2224026,po_t:23913,po_T:2054965,fi_t:26612,fi_T:1444408,pk_t:26038,pk_T:398999},
+  {id:'HQ264019-USA',b:'wm',f:'2a',nm:'HQ264019 Girls Tee USA',cl:'MULTI',xf:'2026-10-08',order:1857566,cut_t:10080,cut_T:1274994,si_t:7200,si_T:1261222,po_t:9725,po_T:1176350,fi_t:11958,fi_T:1139932,pk_t:14976,pk_T:707906},
+  {id:'HQ266427',b:'wm',f:'2a',nm:'Boys Washed Hoodie',cl:'MULTI',xf:'2026-08-27',order:279765,cut_t:0,cut_T:295855,si_t:0,si_T:295855,po_t:0,po_T:291642,fi_t:2740,fi_T:226424,pk_t:3351,pk_T:192669},
+  {id:'HQ024710L-TOP',b:'wm',f:'2a',nm:'OLX Add Top',cl:'MULTI',xf:'2026-08-13',order:50064,cut_t:1794,cut_T:50756,si_t:0,si_T:43509,po_t:1680,po_T:30775,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'HQ024710L-PANT',b:'wm',f:'2a',nm:'OLX Add Pant',cl:'MULTI',xf:'2026-08-13',order:50064,cut_t:1794,cut_T:50756,si_t:5959,si_T:41622,po_t:1141,po_T:16123,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'HQ266427-CHASE',b:'wm',f:'2a',nm:'Boys Hoodie Chase',cl:'MULTI',xf:'2026-09-06',order:5904,cut_t:0,cut_T:6225,si_t:0,si_T:6225,po_t:1539,po_T:4417,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'NB46HQ267990-USA',b:'wm',f:'2b',nm:'YA Tee SCHOOL RED USA',cl:'SCHOOL RED',xf:'2026-08-01',order:440256,cut_t:4082,cut_T:33129,si_t:4972,si_T:14628,po_t:948,po_T:2531,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'HQ268600-USA',b:'wm',f:'2b',nm:'HQ268600 USA',cl:'MULTI',xf:'2026-07-30',order:676756,cut_t:3600,cut_T:160175,si_t:10320,si_T:93616,po_t:4442,po_T:16717,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'263013528',b:'tb',f:'2b',nm:'LS FOX FRIEND TEE AURORE STRIPE',cl:'AURORE STRIPE',xf:'2026-07-16',order:9585,cut_t:0,cut_T:10436,si_t:1684,si_T:8581,po_t:492,po_T:1284,fi_t:0,fi_T:0,pk_t:0,pk_T:0},
+  {id:'263013568',b:'tb',f:'2b',nm:'SS TEE SESAME HEATHER',cl:'SESAME HEATHER',xf:'2026-06-18',order:11740,cut_t:0,cut_T:12575,si_t:0,si_T:12575,po_t:0,po_T:12414,fi_t:0,fi_T:11938,pk_t:0,pk_T:11938},
+  {id:'263900024',b:'tb',f:'2b',nm:'INDIGO BLUE TEE',cl:'INDIGO BLUE',xf:'2026-06-19',order:2875,cut_t:0,cut_T:3068,si_t:0,si_T:3068,po_t:0,po_T:2994,fi_t:0,fi_T:2910,pk_t:0,pk_T:2910},
+  {id:'263900025',b:'tb',f:'2b',nm:'TALBOTS IVORY TEE',cl:'TALBOTS IVORY',xf:'2026-06-19',order:2468,cut_t:0,cut_T:2801,si_t:0,si_T:2801,po_t:0,po_T:2626,fi_t:0,fi_T:2468,pk_t:0,pk_T:2468},
+];
+
+const OD={talbot:{nm:'TALBOTS',os:[
+  {s:'263013528',n:'LS FOX FRIEND TEE AURORE STRIPE',ss:'FL26',tp:'Core',ft:'HANSOLL VINA',q:9585,xf:'2026-07-16',ih:'2026-08-31',tg:'6/16',st:'w',cl:'AURORE STRIPE',ps:[{po:'30159089',fi:'FLT-PPK01',ch:'CANADA',q:234},{po:'30159090',fi:'FLT-LOOSE',ch:'DIRECT',q:1706},{po:'30159091',fi:'FLT-LOOSE',ch:'STORE',q:3485},{po:'30159091',fi:'FLT-PPK01',ch:'STORE',q:4160}]},
+  {s:'264013746',n:'HO26 Core 마루프린팅',ss:'HO26',tp:'Core',ft:'HANSOLL VINA',q:12740,xf:'2026-08-13',ih:'2026-09-28',tg:'7/9',st:'k',cl:'TA IVORY',ps:[{po:'30160446',fi:'—',ch:'—',q:258},{po:'30160447',fi:'—',ch:'—',q:5176},{po:'30160448',fi:'FLT-LOOSE',ch:'STORE',q:3156},{po:'30160448',fi:'FLT-PPK01',ch:'STORE',q:4150}]},
+  {s:'264900010',n:'HO26 Outlet Grey Sky Heather',ss:'HO26',tp:'Outlet',ft:'PT. SADUA',q:2342,xf:'2026-08-13',ih:'2026-09-28',tg:'7/10',st:'t',cl:'GREY SKY',ps:[{po:'30160551',fi:'FLT-LOOSE',ch:'OUTLET',q:1301},{po:'30160551',fi:'FLT-PPK01',ch:'OUTLET',q:1041}]},
+  {s:'264034736',n:'HO26 Core Haute Red',ss:'HO26',tp:'Core',ft:'HANSOLL VINA',q:4325,xf:'2026-08-13',ih:'2026-09-28',tg:'7/10',st:'t',cl:'HAUTE RED',ps:[{po:'30160341',fi:'FLT-PPK01',ch:'CANADA',q:168},{po:'30160340',fi:'FLT-LOOSE',ch:'DIRECT',q:956},{po:'30160342',fi:'FLT-PPK01',ch:'STORE',q:3201}]},
+  {s:'264034719',n:'HO26 Core Haute Red (Risk)',ss:'HO26',tp:'Core',ft:'PT. SADUA',q:342,xf:'2026-08-13',ih:'2026-09-28',tg:'7/10',st:'t',cl:'HAUTE RED',ps:[]},
+]},walmart:{nm:'WALMART',os:[
+  {s:'HQ263935-USA',n:'Girls Core Tee USA',ss:'FL26',tp:'Girls',ft:'HANSOLL VINA',q:2327752,xf:'2026-09-03',tg:'6/25',st:'w',cl:'MULTI',ps:[]},
+  {s:'NB46HQ267990',n:'YA #7990 SCHOOL RED',ss:'FL26',tp:'YA',ft:'HANSOLL VINA',q:440256,xf:'2026-07-30',tg:'진행중',st:'t',cl:'SCHOOL RED',ps:[]},
+  {s:'HQ266427',n:'Boys Washed Hoodie',ss:'FL26',tp:'Boys',ft:'HANSOLL VINA',q:279765,xf:'2026-08-27',tg:'완료',st:'k',cl:'MULTI',ps:[]},
+]}};
+
+let lang='ko',mSt='263013528',mFlt='p',prodFlt='all',cBuyer=null;
+const catC={f:'cf',t:'ct',l:'cl',m:'cm'};
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-ko').classList.toggle('ac',l==='ko');
+  document.getElementById('btn-vi').classList.toggle('ac',l==='vi');
+  const t=T[l];
+  document.getElementById('sb-sub').textContent=t.sb_sub;
+  document.getElementById('sb-date').textContent=t.sb_date;
+  ['ns-overview','ns-order','ns-prep','ns-prod','ns-close'].forEach((id,i)=>document.getElementById(id).textContent=[t.ns_overview,t.ns_order,t.ns_prep,t.ns_prod,t.ns_close][i]);
+  Object.keys(t.ni).forEach(k=>{const el=document.querySelector('#ni-'+k+' .ni-label');if(el)el.textContent=t.ni[k];});
+  document.getElementById('h-greeting').textContent=t.greeting;
+  document.getElementById('h-sub').textContent=t.greeting_sub;
+  document.getElementById('al1').innerHTML=t.al1;
+  document.getElementById('al2').innerHTML=t.al2;
+  document.getElementById('al3').innerHTML=t.al3;
+  ['st1l','st2l','st3l','st4l'].forEach(id=>document.getElementById(id).textContent=t[id]);
+  document.getElementById('h-shortcut-title').innerHTML='<i class="ti ti-apps"></i>'+t.shortcut;
+  ['hc1t','hc1d','hc2t','hc2d','hc3t','hc3d','hc4t','hc4d','hc5t','hc5d','hc6t','hc6d','hc6tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t[id];});
+  document.getElementById('o-sec-title').innerHTML='<i class="ti ti-chart-bar"></i>'+t.o_sec_title;
+  document.getElementById('tb-styles').textContent=t.tb_styles;
+  document.getElementById('tb-due').textContent=t.o_due;
+  document.getElementById('tb-due2').textContent=t.o_due;
+  document.getElementById('wm-styles').textContent=t.wm_styles;
+  document.getElementById('wm-progress').textContent=t.wm_progress;
+  document.getElementById('wm-danger').textContent=t.wm_danger;
+  document.getElementById('o-hint').innerHTML='<i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:3px"></i>'+t.o_hint;
+  document.getElementById('o-back1-lbl').textContent=t.o_back1;
+  document.getElementById('o-back2-lbl').textContent=t.o_back2;
+  document.getElementById('m-sec-title').innerHTML='<i class="ti ti-box"></i>'+t.m_sec_title;
+  document.getElementById('m-filter-lbl').textContent=t.m_filter;
+  ['mf-p','mf-a','mf-f','mf-l','mf-m'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=[t.mf_p,t.mf_a,t.mf_f,t.mf_l,t.mf_m][i];});
+  ['mth1','mth2','mth3','mth4','mth5','mth6','mth7','mth8'].forEach((id,i)=>document.getElementById(id).textContent=t.mth[i]);
+  document.getElementById('m-empty-lbl').textContent=t.m_empty;
+  document.getElementById('sc-title').innerHTML='<i class="ti ti-layout-grid"></i>'+t.sc_title;
+  document.getElementById('sc-alert').textContent=t.sc_alert;
+  ['sch1','sch2','sch3','sch4','sch5','sch6','sch7'].forEach((id,i)=>document.getElementById(id).textContent=t.sch[i]);
+  document.getElementById('st-d1').textContent=t.sched_status.d;
+  document.getElementById('st-t1').textContent=t.sched_status.t;
+  document.getElementById('st-n1').textContent=t.sched_status.n;
+  document.getElementById('st-d2').textContent=t.sched_status.d;
+  document.getElementById('st-d3').textContent=t.sched_status.w;
+  document.getElementById('st-p1').textContent=t.sched_status.p;
+  document.getElementById('pr-title').innerHTML='<i class="ti ti-needle-thread"></i>'+t.pr_title;
+  document.getElementById('pf-all').textContent=t.pf_all;
+  document.getElementById('ct-title').innerHTML='<i class="ti ti-cut"></i>'+t.ct_title;
+  document.getElementById('ct-alert').textContent=t.ct_alert;
+  ['cth1','cth2','cth3','cth4','cth5','cth6','cth7'].forEach((id,i)=>document.getElementById(id).textContent=t.cth[i]);
+  ['cs-ok1'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t.ct_ok;});
+  ['cs-w1','cs-w2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t.ct_warn;});
+  ['cs-d1','cs-d2','cs-d3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t.ct_danger;});
+  document.getElementById('cl-title').innerHTML='<i class="ti ti-clipboard-check"></i>'+t.cl_title;
+  document.getElementById('cl-empty').textContent=t.cl_empty;
+  document.getElementById('rp-title').innerHTML='<i class="ti ti-report"></i>'+t.rp_title;
+  document.getElementById('rp-empty').textContent=t.rp_empty;
+  renderMat(); renderProd();
+}
+
+function go(id,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('ac'));
+  document.getElementById('v-'+id).classList.add('ac');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('ac'));
+  if(btn)btn.classList.add('ac');
+  const t=T[lang];
+  document.getElementById('page-title').textContent=t.titles[id]||id;
+  const ti=document.querySelector('#topbar-title i');
+  if(ti)ti.className='ti ti-'+(t.icons[id]||'circle');
+  if(id==='material')initMat();
+  if(id==='production')renderProd();
+}
+
+function showOView(v){
+  document.getElementById('vb-o').style.display=v==='b'?'block':'none';
+  document.getElementById('vo-o').style.display=v==='l'?'block':'none';
+  document.getElementById('vr-o').style.display=v==='r'?'block':'none';
+}
+function openBuyer(k){
+  cBuyer=k;const b=OD[k];const t=T[lang];
+  const bg={w:'#FCEBEB',t:'#FAEEDA',k:'#EAF3DE'},tc={w:'#A32D2D',t:'#633806',k:'#27500A'};
+  document.getElementById('bc-o').innerHTML='<span class="bl" onclick="showOView(\'b\')">'+b.nm+'</span><span> › </span><span style="font-weight:500">'+t.o_sec_title+'</span>';
+  document.getElementById('ol').innerHTML=b.os.map(o=>'<div class="orow" onclick="openRecap(\''+k+'\',\''+o.s+'\')"><div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1"><span style="font-size:10px;font-weight:500;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0;background:'+bg[o.st]+';color:'+tc[o.st]+'">'+o.s+'</span><div style="min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+o.n+'</div><div style="font-size:11px;color:#6b7280">'+o.ss+' · '+o.ft+'</div></div></div><div style="display:flex;align-items:center;gap:7px;flex-shrink:0"><span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;background:'+bg[o.st]+';color:'+tc[o.st]+'">'+t.stn[o.st]+'</span><div style="text-align:right"><div style="font-size:12px;font-weight:500">'+Number(o.q).toLocaleString()+'</div><div style="font-size:11px;color:#6b7280">'+o.xf+'</div></div><i class="ti ti-chevron-right" style="font-size:13px;color:#9ca3af"></i></div></div>').join('');
+  showOView('l');
+}
+function openRecap(bk,sn){
+  const o=OD[bk].os.find(x=>x.s===sn);const t=T[lang];
+  const bg={w:'#FCEBEB',t:'#FAEEDA',k:'#EAF3DE'},tc={w:'#A32D2D',t:'#633806',k:'#27500A'};
+  document.getElementById('bc-r').innerHTML='<span class="bl" onclick="showOView(\'b\')">'+OD[bk].nm+'</span><span> › </span><span class="bl" onclick="showOView(\'l\')">'+t.o_sec_title+'</span><span> › </span><span style="font-weight:500">'+sn+'</span>';
+  const pr=o.ps.length?o.ps.map(p=>'<tr><td>'+p.po+'</td><td>'+p.fi+'</td><td>'+p.ch+'</td><td>'+Number(p.q).toLocaleString()+'</td></tr>').join('')+'<tr class="tot"><td colspan="3">Total</td><td>'+Number(o.q).toLocaleString()+'</td></tr>':'<tr><td colspan="4" style="text-align:center;color:#6b7280">—</td></tr>';
+  document.getElementById('rc').innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:5px"><div><div style="font-size:14px;font-weight:500">'+o.n+'</div><div style="font-size:11px;color:#6b7280">'+o.s+' · '+o.ss+' · '+o.tp+'</div></div><span style="font-size:11px;padding:4px 10px;border-radius:10px;font-weight:500;background:'+bg[o.st]+';color:'+tc[o.st]+'">'+t.stn[o.st]+'</span></div><div class="rgrid"><div class="rc"><div class="rl">Qty/수량</div><div class="rn" style="color:'+tc[o.st]+'">'+Number(o.q).toLocaleString()+' pcs</div></div><div class="rc"><div class="rl">X-FTY</div><div class="rn">'+o.xf+'</div></div><div class="rc"><div class="rl">IH-DATE</div><div class="rn">'+(o.ih||'—')+'</div></div><div class="rc"><div class="rl">Factory</div><div class="rn" style="font-size:12px">'+o.ft+'</div></div><div class="rc"><div class="rl">'+(lang==='ko'?'투가일':'Vào chuyền')+'</div><div class="rn">'+o.tg+'</div></div><div class="rc"><div class="rl">Color</div><div class="rn" style="font-size:12px">'+o.cl+'</div></div></div><div style="font-size:11px;font-weight:500;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">PO Recap</div><table class="pt"><thead><tr><th>Master PO</th><th>FIT</th><th>'+(lang==='ko'?'채널':'Kênh')+'</th><th>'+(lang==='ko'?'수량':'SL')+'</th></tr></thead><tbody>'+pr+'</tbody></table>';
+  showOView('r');
+}
+
+function gb(x){return +(x.rv-x.nd).toFixed(2)}
+function gs(x){const b=gb(x);if(x.rv===0&&x.nd>0)return'n';if(b<0)return's';return'k'}
+function gp(x){return x.nd>0?Math.min(100,Math.round(x.rv/x.nd*100)):100}
+function pc_m(sid){return MAT[sid].d.filter(x=>gs(x)!=='k').length}
+function initMat(){
+  document.getElementById('mat-stabs').innerHTML=Object.keys(MAT).map(k=>'<button class="stb'+(k===mSt?' ac':'')+'" onclick="setMS(\''+k+'\',this)">'+k+' <span style="font-size:10px;color:#6b7280">'+({'263013528':'7/16','264013746':'8/13','264900010':'8/13','264034719':'8/13','264034736':'8/13'}[k])+'</span>'+(pc_m(k)>0?'<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#E24B4A;margin-left:3px;vertical-align:1px"></span>':'')+'</button>').join('');
+  renderMat();
+}
+function setMS(k,btn){mSt=k;document.querySelectorAll('.stb').forEach(b=>b.classList.remove('ac'));btn.classList.add('ac');renderMat();}
+function setMF(f,btn){mFlt=f;document.querySelectorAll('#v-material .fb').forEach(b=>{b.classList.remove('ac');b.style.background='';b.style.color='';b.style.borderColor='';});btn.classList.add('ac');if(f==='p'){btn.style.background='#FCEBEB';btn.style.color='#A32D2D';btn.style.borderColor='#F09595';}renderMat();}
+function renderMat(){
+  const t=T[lang];const all=MAT[mSt].d;const prb=all.filter(x=>gs(x)!=='k');
+  const nr=all.filter(x=>x.rv===0&&x.nd>0),sh=all.filter(x=>gs(x)==='s'&&x.rv>0);
+  document.getElementById('mat-stats').innerHTML='<div class="sv"><div class="svl">'+t.mst_total+'</div><div class="svy">'+all.length+'</div></div><div class="sv"><div class="svl">'+t.mst_prob+'</div><div class="svy" style="color:#A32D2D">'+prb.length+'</div></div><div class="sv"><div class="svl">'+t.mst_none+'</div><div class="svy" style="color:#E24B4A">'+nr.length+'</div></div><div class="sv"><div class="svl">'+t.mst_short+'</div><div class="svy" style="color:#854F0B">'+sh.length+'</div></div>';
+  let list=all;
+  if(mFlt==='p')list=prb;else if(mFlt==='f')list=all.filter(x=>['f','t'].includes(x.ct));else if(mFlt==='l')list=all.filter(x=>x.ct==='l');else if(mFlt==='m')list=all.filter(x=>x.ct==='m');
+  const tb=document.getElementById('mat-tbody'),em=document.getElementById('mat-empty');
+  if(!list.length){tb.innerHTML='';em.style.display='block';return}
+  em.style.display='none';
+  tb.innerHTML=list.map(x=>{const b=gb(x),st=gs(x),pt=gp(x);const bc2=b>0?'pos':b<0?'neg':'';const bs=b>0?'+'+b:b===0?'0':''+b;const fc=st==='k'?'#639922':st==='n'?'#E24B4A':'#EF9F27';const sl=st==='k'?t.mat_ok:st==='n'?'<span style="color:#A32D2D;font-weight:500">'+t.mat_none+'</span>':'<span style="color:#854F0B;font-weight:500">'+t.mat_short+'</span>';return'<tr><td><span class="cb '+catC[x.ct]+'" >'+x.i+'</span></td><td style="text-align:left">'+x.d+'<br><span style="font-size:10px;color:#6b7280">'+x.c+'</span></td><td><span style="font-size:10px;background:#f9fafb;padding:1px 4px;border-radius:3px">'+x.s+'</span></td><td>'+x.nd.toLocaleString()+'</td><td>'+x.rv.toLocaleString()+'</td><td><span class="'+bc2+'">'+bs+'</span></td><td><div class="pb2"><div class="pbr2"><div class="pbf2" style="width:'+pt+'%;background:'+fc+'"></div></div><span style="font-size:10px;min-width:22px">'+pt+'%</span></div></td><td>'+sl+'</td></tr>';}).join('');
+}
+
+function pct(v,t){return t>0?Math.min(100,Math.round(v/t*100)):0}
+function bc(p){return p>=80?'#639922':p>=50?'#BA7517':'#E24B4A'}
+function dleft(xf){return Math.round((new Date(xf)-new Date('2026-06-22'))/(864e5))}
+function getSt(s){const d=dleft(s.xf),pp=pct(s.po_T,s.order);if(pct(s.pk_T,s.order)>=100&&s.order>0)return'done';if(d<0&&pp<100)return'danger';if(d<=7&&pp<50)return'danger';if(d<=14&&pp<30)return'warn';return'ok';}
+function setPF(f,btn){prodFlt=f;document.querySelectorAll('#prod-ftabs .fb').forEach(b=>b.classList.remove('ac'));btn.classList.add('ac');renderProd();}
+function renderProd(){
+  const t=T[lang];
+  let L=PROD.filter(s=>prodFlt==='all'||s.f===prodFlt||s.b===prodFlt);
+  if(prodFlt==='wm')L=PROD.filter(s=>s.b==='wm');
+  if(prodFlt==='tb')L=PROD.filter(s=>s.b==='tb');
+  const tO=L.reduce((a,s)=>a+s.order,0),tP=L.reduce((a,s)=>a+s.po_T,0),tT=L.reduce((a,s)=>a+s.po_t,0);
+  const risk=L.filter(s=>['danger','warn'].includes(getSt(s))).length;
+  const fmt=n=>n>=10000?(n/10000).toFixed(1)+'만':n.toLocaleString();
+  document.getElementById('prod-stats').innerHTML='<div class="sv"><div class="svl">'+t.prod_stat[0]+'</div><div class="svy">'+fmt(tO)+'</div></div><div class="sv"><div class="svl">'+t.prod_stat[1]+'</div><div class="svy">'+fmt(tP)+'</div></div><div class="sv"><div class="svl">'+t.prod_stat[2]+'</div><div class="svy" style="color:#3C3489">'+tT.toLocaleString()+'</div></div><div class="sv"><div class="svl">'+t.prod_stat[3]+'</div><div class="svy" style="color:#A32D2D">'+risk+'</div></div>';
+  const stCls={ok:'t-g',warn:'t-a',danger:'t-r',done:'t-b'};
+  document.getElementById('prod-cards').innerHTML=L.map(s=>{
+    const st=getSt(s),cp=pct(s.cut_T,s.order),pp=pct(s.po_T,s.order),pkp=pct(s.pk_T,s.order);
+    const d=dleft(s.xf),dStr=d<0?'<span style="color:#A32D2D;font-weight:500">D+'+(Math.abs(d))+'</span>':'D-'+d;
+    const chip=s.po_t>0?'<span style="font-size:10px;background:#EEEDFE;color:#3C3489;padding:2px 5px;border-radius:4px;font-weight:500">+'+s.po_t.toLocaleString()+'</span>':'';
+    return'<div class="pcard" id="pc-'+s.id+'"><div class="pc-hd" onclick="togP(\''+s.id+'\')"><div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1"><span class="sp2 '+(s.b==='tb'?'sp-tb':'sp-wm')+'">'+s.f.toUpperCase()+'</span><div style="min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.id+' '+s.nm+'</div><div style="font-size:11px;color:#6b7280">'+s.cl+' · '+s.xf+' · '+dStr+'</div></div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div class="pgcol"><div class="pg"><span class="pgl">'+t.prod_proc[0]+'</span><div class="pgbar"><div class="pgf" style="width:'+cp+'%;background:'+bc(cp)+'"></div></div><span class="pgv">'+cp+'%</span></div><div class="pg"><span class="pgl">'+t.prod_proc[2]+'</span><div class="pgbar"><div class="pgf" style="width:'+pp+'%;background:'+bc(pp)+'"></div></div><span class="pgv">'+pp+'%</span></div><div class="pg"><span class="pgl">'+t.prod_proc[4]+'</span><div class="pgbar"><div class="pgf" style="width:'+pkp+'%;background:#1D9E75"></div></div><span class="pgv">'+pkp+'%</span></div></div><div style="text-align:right;min-width:60px"><div style="font-size:11px;font-weight:500">'+(s.order>=10000?(s.order/10000).toFixed(1)+'만':s.order.toLocaleString())+'</div>'+chip+'</div><span class="tag '+stCls[st]+'">'+t.prod_st[st]+'</span><i class="ti ti-chevron-down" id="chv-'+s.id+'" style="font-size:13px;color:#9ca3af;transition:transform .2s;flex-shrink:0"></i></div></div><div class="pc-bd" id="pbd-'+s.id+'"><table class="mt"><thead><tr><th style="text-align:left">'+(lang==='ko'?'공정':'Công đoạn')+'</th><th>'+(lang==='ko'?'오늘':'Hôm nay')+'</th><th>'+(lang==='ko'?'누계':'Lũy kế')+'</th><th>'+(lang==='ko'?'오더대비':'So đơn')+'</th><th>'+(lang==='ko'?'잔량':'Còn lại')+'</th></tr></thead><tbody><tr><td>'+t.prod_proc[0]+'</td><td>'+s.cut_t.toLocaleString()+'</td><td>'+s.cut_T.toLocaleString()+'</td><td>'+cp+'%</td><td class="'+(s.cut_T>=s.order?'pos':'neg')+'">'+(s.cut_T>=s.order?'+':'')+(s.cut_T-s.order).toLocaleString()+'</td></tr><tr><td>'+t.prod_proc[1]+'</td><td>'+s.si_t.toLocaleString()+'</td><td>'+s.si_T.toLocaleString()+'</td><td>'+pct(s.si_T,s.order)+'%</td><td class="'+(s.si_T>=s.order?'pos':'neg')+'">'+(s.si_T>=s.order?'+':'')+(s.si_T-s.order).toLocaleString()+'</td></tr><tr><td>'+t.prod_proc[2]+'</td><td style="color:#3C3489;font-weight:500">'+s.po_t.toLocaleString()+'</td><td>'+s.po_T.toLocaleString()+'</td><td>'+pp+'%</td><td class="'+(s.po_T>=s.order?'pos':'neg')+'">'+(s.po_T>=s.order?'+':'')+(s.po_T-s.order).toLocaleString()+'</td></tr><tr><td>'+t.prod_proc[3]+'</td><td>'+s.fi_t.toLocaleString()+'</td><td>'+s.fi_T.toLocaleString()+'</td><td>'+pct(s.fi_T,s.order)+'%</td><td class="'+(s.fi_T>=s.order?'pos':'neg')+'">'+(s.fi_T>=s.order?'+':'')+(s.fi_T-s.order).toLocaleString()+'</td></tr><tr class="tot"><td>'+t.prod_proc[4]+'</td><td style="color:#1D9E75;font-weight:500">'+s.pk_t.toLocaleString()+'</td><td>'+s.pk_T.toLocaleString()+'</td><td>'+pkp+'%</td><td class="'+(s.pk_T>=s.order?'pos':'neg')+'">'+(s.pk_T>=s.order?'+':'')+(s.pk_T-s.order).toLocaleString()+'</td></tr></tbody></table></div></div>';
+  }).join('');
+}
+function togP(id){const bd=document.getElementById('pbd-'+id),chv=document.getElementById('chv-'+id);const op=bd.classList.toggle('op');if(chv)chv.style.transform=op?'rotate(180deg)':'rotate(0deg)';}
+
+showOView('b');
+initMat();
+renderProd();
+</script>
+</body>
+</html>
